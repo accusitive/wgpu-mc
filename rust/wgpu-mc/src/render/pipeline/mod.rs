@@ -3,6 +3,7 @@ pub mod entity;
 pub mod sky;
 pub mod terrain;
 pub mod transparent;
+pub mod particle;
 // pub mod skybox;
 
 use crate::render::shader::WmShader;

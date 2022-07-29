@@ -1,5 +1,6 @@
 mod chunk;
 mod entity;
+mod particle;
 
 #[macro_use]
 extern crate wgpu_mc;
@@ -9,9 +10,11 @@ use std::{fs, thread};
 use std::path::PathBuf;
 
 use std::time::{Instant, SystemTime, UNIX_EPOCH};
+use particle::make_particle;
 use wgpu_mc::mc::resource::ResourcePath;
 
 use futures::executor::block_on;
+use wgpu_mc::render::pipeline::particle::ParticlePipeline;
 use wgpu_mc::{HasWindowSize, wgpu, WindowSize, WmRenderer};
 use winit::event::{DeviceEvent, ElementState, Event, KeyboardInput, VirtualKeyCode, WindowEvent};
 use winit::event_loop::{ControlFlow, EventLoop};
@@ -114,6 +117,7 @@ fn main() {
         &SkyPipeline,
         &TransparentPipeline,
         &DebugLinesPipeline,
+        &ParticlePipeline {particles: &[] }
     ]);
 
     let blockstates_path = _mc_root.join("blockstates");
@@ -152,7 +156,7 @@ fn begin_rendering(
     wm: WmRenderer
 ) {
     let (entity, mut instances) = describe_entity(&wm);
-
+    let particles = make_particle(&wm);
     let chunk = make_chunks(&wm);
 
     {
@@ -286,7 +290,12 @@ fn begin_rendering(
                                 &instances
                             ]
                         },
-                        &DebugLinesPipeline
+                        &DebugLinesPipeline,
+                        &ParticlePipeline {
+                            particles: &[
+                                &particles
+                            ]
+                        }
                     ],
                     &view
                 );
@@ -366,6 +375,7 @@ fn begin_rendering(
                 ).collect();
 
                 instances.upload(&wm);
+                particles.upload(&wm);
 
                 frame_start = Instant::now();
             }

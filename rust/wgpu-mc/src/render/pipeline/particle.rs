@@ -117,10 +117,7 @@ impl<'frames> WmPipeline for ParticlePipeline<'frames> {
                         entry_point: shader.get_frag().1,
                         targets: &[wgpu::ColorTargetState {
                             format: wgpu::TextureFormat::Bgra8Unorm,
-                            blend: Some(wgpu::BlendState {
-                                color: wgpu::BlendComponent::OVER,
-                                alpha: wgpu::BlendComponent::OVER,
-                            }),
+                            blend: Some(wgpu::BlendState::ALPHA_BLENDING),
                             write_mask: Default::default(),
                         }],
                     }),
@@ -177,7 +174,7 @@ impl<'frames> WmPipeline for ParticlePipeline<'frames> {
             render_pass.set_vertex_buffer(1, uploaded.instance_vbo.slice(..));
             render_pass.set_index_buffer(particle.index.slice(..), wgpu::IndexFormat::Uint16);
 
-            render_pass.draw(0..4, 0..instances.instances.len() as u32);
+            render_pass.draw_indexed(0..6, 0, 0..instances.instances.len() as u32);
         });
     }
 }

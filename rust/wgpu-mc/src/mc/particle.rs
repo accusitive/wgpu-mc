@@ -7,6 +7,7 @@ use crate::{render::particle::ParticleVertex, texture::BindableTexture, WgpuStat
 
 use super::entity::Position;
 const PARTICLE_VERTICIES: [ParticleVertex; 4] = [
+    // Top right
     ParticleVertex {
         position: [1.0, 1.0, 0.0],
         tex_coords: [1.0, 1.0],
@@ -40,7 +41,7 @@ impl Particle {
             texture,
             index: Arc::new(wgpu_state.device.create_buffer_init(&BufferInitDescriptor {
                 label: None,
-                contents: &[0, 1, 3, 1, 2, 3],
+                contents: bytemuck::cast_slice(&[0u16, 1, 3, 1, 2, 3]),
                 usage: wgpu::BufferUsages::INDEX,
             })),
             mesh: Arc::new(wgpu_state.device.create_buffer_init(&BufferInitDescriptor {

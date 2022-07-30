@@ -31,7 +31,7 @@ This is a trait that provides a block state key for a given coordinate.
 
 ## Entity Rendering
 
-To render entities, you need an entity model. wgpu-mc makes no assumptions about how entity models are defined, 
+To render entities, you need an entity model. wgpu-mc makes no assumptions about how entity models are defined,
 so it's up to you to provide them to wgpu-mc.
 
 See the [render::entity] module for an example of rendering an example entity.
@@ -47,9 +47,9 @@ pub mod render;
 pub mod texture;
 pub mod util;
 
+pub use minecraft_assets;
 pub use naga;
 pub use wgpu;
-pub use minecraft_assets;
 
 use crate::camera::UniformMatrixHelper;
 
@@ -58,7 +58,10 @@ use crate::mc::MinecraftState;
 use raw_window_handle::HasRawWindowHandle;
 
 use std::collections::HashMap;
-use wgpu::{BindGroupDescriptor, BindGroupEntry, BufferDescriptor, RenderPassDescriptor, TextureFormat, TextureViewDescriptor};
+use wgpu::{
+    BindGroupDescriptor, BindGroupEntry, BufferDescriptor, RenderPassDescriptor, TextureFormat,
+    TextureViewDescriptor,
+};
 
 use crate::texture::TextureSamplerView;
 
@@ -174,7 +177,7 @@ impl WmRenderer {
             wgpu::Extent3d {
                 width: surface_config.width,
                 height: surface_config.height,
-                depth_or_array_layers: 1
+                depth_or_array_layers: 1,
             },
             "depth texture",
         );
@@ -228,7 +231,8 @@ impl WmRenderer {
             return;
         }
 
-        let mut surface_config = (*self.wgpu_state.surface_config.as_ref().unwrap().load_full()).clone();
+        let mut surface_config =
+            (*self.wgpu_state.surface_config.as_ref().unwrap().load_full()).clone();
 
         surface_config.width = new_size.width;
         surface_config.height = new_size.height;
@@ -250,7 +254,7 @@ impl WmRenderer {
                 wgpu::Extent3d {
                     width: surface_config.width,
                     height: surface_config.height,
-                    depth_or_array_layers: 1
+                    depth_or_array_layers: 1,
                 },
                 "depth_texture",
             )));
@@ -263,8 +267,10 @@ impl WmRenderer {
         let surface_config = self.wgpu_state.surface_config.as_ref().unwrap().load();
         camera.aspect = surface_config.width as f32 / surface_config.height as f32;
 
+        let (proj, view) = camera.build_view_projection_matrix();
         let uniforms = UniformMatrixHelper {
-            view_proj: camera.build_view_projection_matrix().into(),
+            view: view.into(),
+            proj: proj.into(),
         };
 
         self.mc.camera.store(Arc::new(camera));
@@ -288,28 +294,32 @@ impl WmRenderer {
                 usage: wgpu::BufferUsages::STORAGE | wgpu::BufferUsages::COPY_DST,
                 mapped_at_creation: false,
             });
-            let animated_block_bind_group = self
-                .wgpu_state
-                .device
-                .create_bind_group(&BindGroupDescriptor {
-                    label: None,
-                    layout: self
-                        .render_pipeline_manager
-                        .load()
-                        .bind_group_layouts
-                        .read()
-                        .get("ssbo")
-                        .unwrap(),
-                    entries: &[BindGroupEntry {
-                        binding: 0,
-                        resource: wgpu::BindingResource::Buffer(
-                            animated_block_buffer.as_entire_buffer_binding(),
-                        ),
-                    }],
-                });
+            let animated_block_bind_group =
+                self.wgpu_state
+                    .device
+                    .create_bind_group(&BindGroupDescriptor {
+                        label: None,
+                        layout: self
+                            .render_pipeline_manager
+                            .load()
+                            .bind_group_layouts
+                            .read()
+                            .get("ssbo")
+                            .unwrap(),
+                        entries: &[BindGroupEntry {
+                            binding: 0,
+                            resource: wgpu::BindingResource::Buffer(
+                                animated_block_buffer.as_entire_buffer_binding(),
+                            ),
+                        }],
+                    });
 
-            self.mc.animated_block_buffer.store(Arc::new(Some(animated_block_buffer)));
-            self.mc.animated_block_bind_group.store(Arc::new(Some(animated_block_bind_group)));
+            self.mc
+                .animated_block_buffer
+                .store(Arc::new(Some(animated_block_buffer)));
+            self.mc
+                .animated_block_bind_group
+                .store(Arc::new(Some(animated_block_bind_group)));
         }
 
         self.wgpu_state.queue.write_buffer(
@@ -330,7 +340,11 @@ impl WmRenderer {
         // );
     }
 
-    pub fn render(&self, wm_pipelines: &[&dyn WmPipeline], output_texture_view: &wgpu::TextureView) -> Result<(), wgpu::SurfaceError> {
+    pub fn render(
+        &self,
+        wm_pipelines: &[&dyn WmPipeline],
+        output_texture_view: &wgpu::TextureView,
+    ) -> Result<(), wgpu::SurfaceError> {
         let _span_ = span!(Level::TRACE, "render").entered();
 
         let mut encoder =

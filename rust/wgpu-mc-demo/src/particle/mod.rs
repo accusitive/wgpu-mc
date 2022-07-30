@@ -20,9 +20,12 @@ pub fn make_particle(wm: &WmRenderer) -> ParticleInstances {
     let particle = Arc::new(Particle::new(&wm.wgpu_state, test_particle_atlas.bindable_texture.clone()));
 
     let mut instances = vec![];
-    for i in 0..100{
-        for j in 0..100{
-            instances.push(ParticleInstanceTransforms { position: [i as f32, 0.0, j as f32] });
+    for i in 0..10{
+        for j in 0..10{
+            for k in 0..10 {
+                instances.push(ParticleInstanceTransforms { position: [i as f32, j as f32, k as f32] });
+
+            }
         }
     }
     let pi = ParticleInstances::new(

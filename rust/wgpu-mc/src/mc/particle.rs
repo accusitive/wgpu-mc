@@ -14,16 +14,16 @@ const PARTICLE_VERTICIES: [ParticleVertex; 4] = [
     },
     // Bottom right
     ParticleVertex {
-        position: [1.0, 0.0, 0.0],
+        position: [1.0, -1.0, 0.0],
         tex_coords: [1.0, 0.0],
     },
     // Bottom left
     ParticleVertex {
-        position: [0.0, 0.0, 0.0],
+        position: [-1.0, -1.0, 0.0],
         tex_coords: [0.0, 0.0],
     },
     ParticleVertex {
-        position: [0.0, 1.0, 0.0],
+        position: [-1.0, 1.0, 0.0],
         tex_coords: [0.0, 1.0],
     },
 ];

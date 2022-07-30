@@ -47,13 +47,16 @@ impl WmPipeline for DebugLinesPipeline {
     fn provide_shaders(&self, wm: &WmRenderer) -> HashMap<String, Box<dyn WmShader>> {
         [(
             "wgpu_mc:shaders/debug_lines".into(),
-            Box::new(WgslShader::init(
-                &"wgpu_mc:shaders/debug_lines.wgsl".try_into().unwrap(),
-                &*wm.mc.resource_provider,
-                &wm.wgpu_state.device,
-                "fs_main".into(),
-                "vs_main".into(),
-            ).unwrap()) as Box<dyn WmShader>,
+            Box::new(
+                WgslShader::init(
+                    &"wgpu_mc:shaders/debug_lines.wgsl".try_into().unwrap(),
+                    &*wm.mc.resource_provider,
+                    &wm.wgpu_state.device,
+                    "fs_main".into(),
+                    "vs_main".into(),
+                )
+                .unwrap(),
+            ) as Box<dyn WmShader>,
         )]
         .into_iter()
         .collect()
@@ -178,7 +181,8 @@ impl WmPipeline for DebugLinesPipeline {
             * cgmath::Matrix4::<f32>::from_angle_y(Rad(camera.yaw));
 
         let helper = UniformMatrixHelper {
-            view_proj: rotation_matrix.into(),
+            proj: rotation_matrix.into(),
+            view: [[0.0; 4]; 4],
         };
 
         let rotation_buffer = arena.alloc(wm.wgpu_state.device.create_buffer_init(

@@ -1,5 +1,7 @@
 struct CameraUniform {
-    view_proj: mat4x4<f32>;
+    view: mat4x4<f32>;
+    proj: mat4x4<f32>;
+
 };
 
 [[group(0), binding(0)]]
@@ -17,7 +19,7 @@ fn vs_main(
 ) -> VertexResult {
     var vr: VertexResult;
 
-    vr.pos = projection.view_proj * vec4<f32>(pos_in, 1.0);
+    vr.pos = projection.proj * projection.view * vec4<f32>(pos_in, 1.0);
     vr.color = vec4<f32>(f32(color & 0xffu) / 255.0, f32((color >> 8u) & 0xffu) / 255.0, f32((color >> 16u) & 0xffu) / 255.0, f32((color >> 24u) & 0xffu) / 255.0);
 
     return vr;

@@ -1,5 +1,7 @@
-struct Uniforms {
-    view_proj: mat4x4<f32>;
+struct CameraUniform {
+    view: mat4x4<f32>;
+    proj: mat4x4<f32>;
+
 };
 
 struct Transforms {
@@ -34,7 +36,7 @@ fn vs_main(
     var part_transform: mat4x4<f32> = transforms.mats[part_transform_index];
 
     //vr.pos = uniform_data.view_proj * part_transform * vec4<f32>(pos_in, 0.0);
-    vr.pos = uniform_data.view_proj * part_transform * vec4<f32>(pos_in, 1.0);
+    vr.pos = uniform_data.proj * uniform_data.view * part_transform * vec4<f32>(pos_in, 1.0);
     vr.tex_coords = tex_coords;
     vr.normal = mat3x3<f32>(part_transform[0].xyz, part_transform[1].xyz, part_transform[2].xyz) * normal;
 

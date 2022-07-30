@@ -1,9 +1,11 @@
-struct Uniforms {
-    view_proj: mat4x4<f32>;
+struct CameraUniform {
+    view: mat4x4<f32>;
+    proj: mat4x4<f32>;
+
 };
 
 [[group(0), binding(0)]]
-var<uniform> uniform_data: Uniforms;
+var<uniform> uniform_data: CameraUniform;
 
 struct VertexResult {
     [[builtin(position)]] pos: vec4<f32>;
@@ -17,7 +19,7 @@ fn vs_main(
 ) -> VertexResult {
     var vr: VertexResult;
 
-    vr.pos = uniform_data.view_proj * vec4<f32>(pos_in, 1.0);
+    vr.pos = uniform_data.proj * uniform_data.view * vec4<f32>(pos_in, 1.0);
     vr.pos.z = vr.pos.z + 0.5;
 
     vr.color = color;
